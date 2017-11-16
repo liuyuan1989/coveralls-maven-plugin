@@ -1,34 +1,21 @@
-pipeline {
-  agent any
-  stages {
-    stage('Clone Code') {
-      steps {
-        git(url: 'git@github.com:liuyuan1989/coveralls-maven-plugin.git', branch: 'master')
-      }
-    }
-    stage('Code Analysis') {
-      steps {
-        sh '''sh "mvn clean"
-sh "infer -- mvn compile"'''
-      }
-    }
-    stage('Testing') {
-      steps {
-        sh '''sh "mvn test"
-'''
-        junit 'target/surefire-reports/TEST-*.xml'
-      }
-    }
-    stage('Package') {
-      steps {
-        sh 'sh "\'mvn\' -Dmaven.test.skip=true package"'
-        archiveArtifacts 'target/*.jar'
-      }
-    }
-    stage('Deploy') {
-      steps {
-        sh 'echo \'pipeline success\''
-      }
-    }
-  }
+node {
+   stage('Clone Code') { // for display purposes
+      // Get some code from a GitHub repository
+      git 'https://github.com/trautonen/coveralls-maven-plugin.git/'
+   }
+   stage('Code Analysis') {
+       sh "mvn clean"
+       sh "infer -- mvn compile"
+   }
+   stage('Testing') {
+       sh "mvn test"
+       junit 'target/surefire-reports/TEST-*.xml'
+   }
+   stage('Package') {
+       sh "'mvn' -Dmaven.test.skip=true package"
+       archive 'target/*.jar'
+   }
+   stage('Deploy') {
+       echo 'pipeline success'
+   }
 }
